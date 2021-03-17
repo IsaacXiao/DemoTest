@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    LocalScaleWidget localScaleWidget;
+    ImageView localScaleWidget;
     localScaleWidget.show();
     return a.exec();
 }
