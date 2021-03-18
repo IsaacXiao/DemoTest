@@ -57,5 +57,6 @@ int main()
     cout<<vs[0].str<<endl;
     if(s.str != NULL)
         cout<<s.str<<endl;
+	
     return 0;
 }
