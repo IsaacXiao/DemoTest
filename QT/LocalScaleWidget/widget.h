@@ -2,6 +2,7 @@
 #define IMAGE_VIEW_H
 #include <QWidget>
 #include <QImage>
+#include <QLabel>
 
 class ImageView : public QWidget
 {
