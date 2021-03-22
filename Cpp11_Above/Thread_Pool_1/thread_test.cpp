@@ -1,137 +1,63 @@
 #include "thread_pool.h"
 #include <iostream>
 #include <functional>
-
-
+#include "./ThreadSafe_Queue.hpp"
 using namespace std;
 
-std::function<int(int)> func;
 
-
-void fun1(int slp)
+struct Mediator
 {
-    printf("  hello, fun1 !  %d\n", std::this_thread::get_id());
-    if (slp>0) {
-        printf(" ======= fun1 sleep %d  =========  %d\n", slp, std::this_thread::get_id());
-        std::this_thread::sleep_for(std::chrono::milliseconds(slp));
-    }
-}
-
-
-struct gfun {
-    int operator()(int n) {
-        printf("%d  hello, gfun !  %d\n", n, std::this_thread::get_id());
-        return 42;
-    }
+    //1. 把int替换成cv::mat类型
+    ThreadSafe_Queue<int> img_stash_; 
 };
 
+Mediator mediator_;
 
-class A {
-public:
-    static int Afun(int n = 0) {   //函数必须是 static 的才能直接使用线程池
-        std::cout << n << "  hello, Afun !  " << std::this_thread::get_id() << std::endl;
-        return n;
-    }
-
-
-    static std::string Bfun(int n, std::string str, char c) {
-        std::cout << n << "  hello, Bfun !  " << str.c_str() << "  " << (int)c << "  " << std::this_thread::get_id() << std::endl;
-        return str;
-    }
-};
-
-
-auto lambda = [](int) {
-    std::cout << "Hello,World!!!" << std::endl;
-    return 10;
-};
-
-    // 有两种方法可以实现调用类成员，
-    // 一种是使用   bind： .commit(std::bind(&Dog::sayHello, &dog));
-    // 一种是用 mem_fn： .commit(std::mem_fn(&Dog::sayHello), &dog)
-
-struct Dog
+struct ICameraGrabber
 {
-    int sayHello(int a)
+    int img{0};
+    bool IsStoped() const { return stop_; }
+    void StopGrabbing() { stop_ = true; }
+    virtual void GetImage() = 0;
+private:
+    bool stop_{false};
+};
+
+//2. 把采集逻辑都包到DMKCamera类里面去
+struct DMKCamera: public ICameraGrabber
+{
+    //3. 重写这个虚函数
+    void GetImage() override
     {
-        cout << "hello" << endl;
-        return ++a;
+        while ( !IsStoped() )
+        {
+            cout << "\n pushing image to stash: " << endl;
+            mediator_.img_stash_.push(++img);
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+        }
     }
 };
     
-
+///下面的main函数调用由我来完成
+///我能够把一个int数字拿到控制台显示就能把一张图片拿到ui上显示
 int main(int argc,char** argv)
 {
     try 
     {
-        threadpool executor{ 50 };
-        Dog dog;
-        std::future<int> dog_bark = executor.commit(std::bind(&Dog::sayHello,&dog,345));
+        threadpool executor{ 8 };
+        ICameraGrabber * camera = new DMKCamera;
+    
+        std::future<void> res = executor.commit(std::bind(&ICameraGrabber::GetImage,camera));
 
-        int res = dog_bark.get();
-
-        cout << res << endl;
-        
-        std::cout << " =======  sleep ========= " << std::this_thread::get_id() << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-
-        cout << res << endl;
-
-        /*A a;
-        std::future<void> ff = executor.commit(fun1, 0);
-        std::future<int> fg = executor.commit(gfun{}, 0);
-        std::future<int> gg = executor.commit(a.Afun, 9999); //IDE提示错误,但可以编译运行 
-        std::future<std::string> gh = executor.commit(A::Bfun, 9998, "mult args", 123);
-        std::future<std::string> fh = executor.commit([]()->std::string { std::cout << "hello, fh !  " << std::this_thread::get_id() << std::endl; return "hello,fh ret !"; });
-
-        std::cout << " =======  sleep ========= " << std::this_thread::get_id() << std::endl;
-        std::this_thread::sleep_for(std::chrono::microseconds(900));
-
-
-        for (int i = 0; i < 50; i++) {
-            executor.commit(fun1, i * 100);
+        int c;
+        while ((c = getchar()) != 'q')
+        {
+            int img;
+            mediator_.img_stash_.wait_and_pop(img);
+            cout << "display: " << img << endl;
         }
-        std::cout << " =======  commit all ========= " << std::this_thread::get_id() << " idlsize=" << executor.idlCount() << std::endl;
-
-
-        std::cout << " =======  sleep ========= " << std::this_thread::get_id() << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-
-
-        ff.get(); //调用.get()获取返回值会等待线程执行完,获取返回值
-        std::cout << fg.get() << "  " << fh.get().c_str() << "  " << std::this_thread::get_id() << std::endl;
-
-
-        std::cout << " =======  sleep ========= " << std::this_thread::get_id() << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-
-
-        std::cout << " =======  fun1,55 ========= " << std::this_thread::get_id() << std::endl;
-        executor.commit(fun1, 55).get();    //调用.get()获取返回值会等待线程执行完
-
-
-        std::cout << "end... " << std::this_thread::get_id() << std::endl;
-
-        threadpool pool(4);
-        std::vector< std::future<int> > results;
-
-
-        for (int i = 0; i < 8; ++i) {
-            results.emplace_back(
-                pool.commit([i] {
-                std::cout << "hello " << i << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-                std::cout << "world " << i << std::endl;
-                return i*i;
-            })
-            );
-        }
-        std::cout << " =======  commit all2 ========= " << std::this_thread::get_id() << std::endl;
-
-
-        for (auto && result : results)
-            std::cout << result.get() << ' ';
-        std::cout << std::endl;*/
+        camera->StopGrabbing();
+        cout << "end grabbing" << endl;
         return 0;
     }
     catch (std::exception& e) 

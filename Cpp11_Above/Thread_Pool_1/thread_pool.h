@@ -16,8 +16,6 @@
 #define  MAX_THREAD_NUM 256
 
 
-//线程池,可以提交变参函数或拉姆达表达式的匿名函数执行,可以获取执行返回值
-//不支持类成员函数, 支持类静态成员函数或全局函数,Opteron()函数等
 class threadpool
 {
     using Task = std::function<void()>;
@@ -78,23 +76,20 @@ public:
 public:
     // 提交一个任务
     // 调用.get()获取返回值会等待任务执行完,获取返回值
-    // 有两种方法可以实现调用类成员，
-    // 一种是使用   bind： .commit(std::bind(&Dog::sayHello, &dog));
-    // 一种是用 mem_fn： .commit(std::mem_fn(&Dog::sayHello), &dog)
     template<class F, class... Args>
     auto commit(F&& f, Args&&... args) ->std::future<decltype(f(args...))>
     {
-        if (stoped_.load())    // stop == true ??
+        if (stoped_.load())    
             throw std::runtime_error("commit on ThreadPool is stopped.");
 
 
         using RetType = decltype(f(args...)); // typename std::result_of<F(Args...)>::type, 函数 f 的返回值类型
-        auto task = std::make_shared<std::packaged_task<RetType()> >(
+        auto task = std::make_shared<std::packaged_task<RetType()>>(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...)
             );    // wtf !
         std::future<RetType> future = task->get_future();
         {    // 添加任务到队列
-            std::lock_guard<std::mutex> lock{ lock_ };//对当前块的语句加锁  lock_guard 是 mutex 的 stack 封装类，构造的时候 lock()，析构的时候 unlock()
+            std::lock_guard<std::mutex> lock{ lock_ };
             tasks_.emplace(
                 [task]()
             { // push(Task{...})
