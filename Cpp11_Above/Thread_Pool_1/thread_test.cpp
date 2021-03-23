@@ -44,7 +44,7 @@ int main(int argc,char** argv)
 {
     try 
     {
-        threadpool executor{ 8 };
+        threadpool executor{ 1 };
         ICameraGrabber * camera = new DMKCamera;
     
         std::future<void> res = executor.commit(std::bind(&ICameraGrabber::GetImage,camera));

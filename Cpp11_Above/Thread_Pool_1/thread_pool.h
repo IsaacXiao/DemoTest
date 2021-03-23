@@ -82,7 +82,6 @@ public:
         if (stoped_.load())    
             throw std::runtime_error("commit on ThreadPool is stopped.");
 
-
         using RetType = decltype(f(args...)); // typename std::result_of<F(Args...)>::type, 函数 f 的返回值类型
         auto task = std::make_shared<std::packaged_task<RetType()>>(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...)
@@ -98,7 +97,6 @@ public:
             );
         }
         condition_.notify_one(); // 唤醒一个线程执行
-
 
         return future;
     }
