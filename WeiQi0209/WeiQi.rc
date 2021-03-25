@@ -1,0 +1,213 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_WeiQi               ICON    DISCARDABLE     "Weiqi.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+围棋 MENU DISCARDABLE 
+BEGIN
+    POPUP "棋谱选项(&G)"
+    BEGIN
+        MENUITEM "打开棋谱(&O)",                IDM_OPEN
+        MENUITEM "保存棋谱(&S)",                IDM_SAVE
+    END
+    MENUITEM "申请对局(&T)",                IDM_TIME, GRAYED
+    MENUITEM "对局开始(&S)",                IDM_START, GRAYED
+    MENUITEM "对局结束(&E)",                IDM_END, GRAYED
+    MENUITEM "关于围棋",                    IDM_APP_ABOUT
+    MENUITEM "",                            ID_MENUITEM40008
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_MY                  CURSOR  DISCARDABLE     "res\\Move_Vnd.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+ABOUTWEIQI DIALOG DISCARDABLE  270, 140, 152, 87
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+FONT 8, "System"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,51,62,50,14
+    ICON            IDI_WeiQi,IDC_STATIC,9,8,20,20
+    CTEXT           "关于围棋",IDC_STATIC,44,14,63,9
+    CTEXT           "信息技术局",IDC_STATIC,44,32,63,9
+    CTEXT           "肖融 , 2012",IDC_STATIC,44,46,63,9
+    GROUPBOX        "About",IDC_STATIC,3,0,145,84
+END
+
+TIMESET DIALOG DISCARDABLE  340, 90, 174, 127
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+FONT 10, "System"
+BEGIN
+    EDITTEXT        IDC_HOUR,24,34,21,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    DEFPUSHBUTTON   "申请",IDOK,33,100,31,13
+    PUSHBUTTON      "取消",IDCANCEL,109,100,31,13
+    CTEXT           "设置双方时限为",IDC_STATIC,33,16,117,9
+    LTEXT           "时",IDC_STATIC,51,37,14,9
+    LTEXT           "分",IDC_STATIC,98,37,14,9
+    LTEXT           "秒",IDC_STATIC,145,37,14,9
+    EDITTEXT        IDC_MIN,71,34,21,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_SEC,118,34,21,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_READONLY | ES_NUMBER
+    GROUPBOX        "时间设置",IDC_STATIC,14,7,147,42
+    GROUPBOX        "黑白选择",IDC_STATIC,16,55,144,40
+    CONTROL         "黑方",IDC_SELBLACK,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP | WS_TABSTOP,59,68,56,10
+    CONTROL         "白方",IDC_SELWHITE,"Button",BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP,59,82,56,10
+    PUSHBUTTON      "接受",IDC_ACCEPT,71,100,31,13
+END
+
+CHAT DIALOG DISCARDABLE  0, 0, 157, 159
+STYLE WS_CHILD | WS_VISIBLE | WS_BORDER
+FONT 10, "System"
+BEGIN
+    CONTROL         "IPAddress1",IDC_IPADDRESS1,"SysIPAddress32",WS_TABSTOP,
+                    8,119,69,12
+    EDITTEXT        IDC_EDIT_SEND,84,119,69,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "联网模式",IDC_BTN_ONLINE,7,139,36,11
+    PUSHBUTTON      "断开",IDC_BTN_UNCONNECT,85,139,28,11
+    DEFPUSHBUTTON   "发送",IDC_BTN_SEND,121,139,28,11
+    EDITTEXT        IDC_EDIT_RECV,3,19,150,76,ES_MULTILINE | ES_AUTOHSCROLL | 
+                    WS_VSCROLL
+    GROUPBOX        "IP地址",IDC_STATIC,3,108,150,29,WS_TABSTOP
+    GROUPBOX        "聊天记录",IDC_STATIC,3,7,150,98,WS_TABSTOP
+    PUSHBUTTON      "连接",IDC_BTN_CONN,49,139,28,11
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    "ABOUTWEIQI", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 145
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 80
+    END
+
+    "TIMESET", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 167
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 120
+    END
+
+    "CHAT", DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 153
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 154
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BLACK               BITMAP  DISCARDABLE     "res\\blackstone.bmp"
+IDB_WHITE               BITMAP  DISCARDABLE     "res\\whitestone.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCEL ACCELERATORS DISCARDABLE 
+BEGIN
+    "S",            IDM_SAVE,               VIRTKEY, CONTROL, ALT, NOINVERT
+END
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

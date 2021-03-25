@@ -1,0 +1,7 @@
+# Microsoft Developer Studio Generated Dependency File, included by ResLib.mak
+
+.\ResLib.rc : \
+	".\res\board-default.bmp"\
+	".\res\btnfocus.wav"\
+	".\res\move.wav"\
+	
