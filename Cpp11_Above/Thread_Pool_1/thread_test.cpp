@@ -35,6 +35,8 @@ struct DMKCamera: public ICameraGrabber
             mediator_.img_stash_.push(++img);
             std::this_thread::sleep_for(std::chrono::seconds(2));
         }
+        cout << "thread is stopped" << endl;
+        //throw "xxx";
     }
 };
     
@@ -44,25 +46,26 @@ int main(int argc,char** argv)
 {
     try 
     {
-        threadpool executor{ 1 };
-        ICameraGrabber * camera = new DMKCamera;
-    
-        std::future<void> res = executor.commit(std::bind(&ICameraGrabber::GetImage,camera));
-
-        int c;
-        while ((c = getchar()) != 'q')
         {
-            int img;
-            mediator_.img_stash_.wait_and_pop(img);
-            cout << "display: " << img << endl;
+            threadpool executor{ 1 };
+            ICameraGrabber * camera = new DMKCamera;
+        
+            /* std::future<void> res = */ executor.commit(std::bind(&ICameraGrabber::GetImage,camera));
+
+            int c;
+            while ((c = getchar()) != 'q')
+            {
+                int img;
+                mediator_.img_stash_.wait_and_pop(img);
+                cout << "display: " << img << endl;
+            }
+            camera->StopGrabbing();
+            cout << "end grabbing" << endl;
         }
-        camera->StopGrabbing();
-        cout << "end grabbing" << endl;
-        return 0;
     }
     catch (std::exception& e) 
     {
         std::cout << "some unhappy happened...  " << std::this_thread::get_id() << e.what() << std::endl;
-
     }
+    return 0;
 }
