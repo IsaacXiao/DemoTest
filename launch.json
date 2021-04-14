@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "g++.exe - 生成和调试活动文件",
+            "type": "cppdbg",
+            "request": "launch",
+            //"program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+            "program": "D:/WorkSpace/Repository/DemoTest/Demo/hour_cost/build/bin/main.exe",
+            "args": [],
+            "stopAtEntry": false,
+            //"cwd": "E:\\Programming\\mingw-w64\\bin",
+            "cwd": "${workspaceFolder}", // 当前项目的路径，即用vscode打开文件夹时的位置，需要注意。
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "E:\\Programming\\mingw-w64\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            //"preLaunchTask": "C/C++: g++.exe build active file"
+            //"preLaunchTask": "Debug", // 第一次开始调试的任务，见task.json
+        }
+    ]
+}
