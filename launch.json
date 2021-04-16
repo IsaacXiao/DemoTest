@@ -10,7 +10,7 @@
             "request": "launch",
             //"program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
             "program": "D:/WorkSpace/Repository/DemoTest/Demo/hour_cost/build/bin/main.exe",
-            "args": [],
+            //"args": ["c"], 向main函数传入的参数填这里
             "stopAtEntry": false,
             //"cwd": "E:\\Programming\\mingw-w64\\bin",
             "cwd": "${workspaceFolder}", // 当前项目的路径，即用vscode打开文件夹时的位置，需要注意。
