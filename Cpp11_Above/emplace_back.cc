@@ -34,7 +34,7 @@ int main()
  
     std::vector<President> reElections;  
     std::cout << "\npush_back:\n";  
-    reElections.push_back(President("Franklin Delano Roosevelt", "the USA", 1936));  
+    reElections.push_back(President("Franklin Delano Roosevelt", "the USA", 1936));  //这里改成emplace_back运行结果一样
  
     std::cout << "\nContents:\n";  
     for (President const& president: elections) {  
