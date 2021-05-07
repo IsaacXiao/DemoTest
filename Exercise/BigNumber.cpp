@@ -1,4 +1,4 @@
-//ÓÃË«ÏòÁ´±íÊµÏÖ´óÊı¼Ó¼õ·¨£¬Ğ§¹ûÈçÌû×ÓËùÃèÊöµÄÒ»Ñù
+
 //https://blog.csdn.net/VonSdite/article/details/78037269
 //https://blog.csdn.net/qq_37193603/article/details/72900259
 #include <list>
@@ -10,133 +10,141 @@
 #include <stack>
 using namespace std;
 
-class BitNum
+template<typename ItorT>
+void print_container(const ItorT first, const ItorT last, const char* separate = "") noexcept
 {
-	int num;
-	bool carry;	//±êÊ¶ÊÇ·ñ²úÉú½øÎ»»òÕß½èÎ»
-	BitNum( int n = 0, bool c = false ): num( n ), carry( c ){ }
-	BitNum & operator+=( int n )
-	{
-		num += n;
-		return *this;
-	}
-	BitNum & operator-=( int n )
-	{
-		num -= n;
-		return *this;
-	}
-};
-
-class BigNum
-{
-	bool negative; //±êÊ¶ÊÇ·ñÎª¸ºÊı
-	
-public:
-	list<BitNum> list_bn;
-	BigNum( ): list_bn( list<BitNum>( ) ), negative( false ){ }
-	//ÓÃn¸ö0³õÊ¼»¯
-	BigNum( size_t n,  BitNum  bn ): list_bn( n, bn ),negative( false ){ }
-	BigNum( string & str_num )
-	{
-		negative = false;
-		//ÕâÀï¾ÍÀÁµÃ´¦Àí·Ç·¨ÊäÈëµÄÒì³£ÁË
-		//´Ó¸ßÎ»µ½µÍÎ»ÊäÈë
-		string::iterator it = str_num.begin();
-		if ( '-' == *it )	//×î¸ßÎ»Îª-ÔòÎª¸ºÊı
-		{
-			negative = true;
-			++it;		//Ç°++Ğ§ÂÊ¸ü¸ß
-		}
-		for ( ; it != str_num.end(); it++ )
-		{
-			//µ¥¸ö×Ö·û×ª»»³ÉÊı×Ö
-			int n = (*it) - '0';
-			BitNum bitn( n, false );
-			list_bn.push_back( bitn );
-		}
-	}
-	bool IsNegative( ) const { return negative; }
-	//list<BitNum> GetList( ) const { return list_bn; }
-	size_t Len( ) const { return list_bn.size( ); }
-};
-
-//¼õ·¨ÀÁµÃĞ´ÁË
-BigNum operator-( const BigNum & b1, const BigNum & b2 )
-{
-	return BigNum( );
+	//typedef typename iterator_traits<ItorT>::value_type Ty;
+	std::copy( first, last, std::ostream_iterator<decltype(*first)>( std::cout, separate ) );
+	//std::cout << std::endl;
 }
 
-//ÎªBitNumÊµÏÖ+ÔËËã·û£¬¼ÓµÄ½á¹ûÅĞ¶ÏÊÇ·ñ´óÓÚµÈÓÚ10£¬ÈôÊÇÔòÉèÖÃcarryÎªtrue±íÊ¾´øÁËÒ»Î»µ½Á´±íµÄÏÂÒ»¸ö½Úµã£¬°Ñ¸Ã½á¹ûÄ£10ÇóÓàÊı´æµ½Á´±íµÄ½ÚµãÀï
-BitNum operator+( const BitNum & b1, const BitNum & b2 )
+constexpr bool NO_CARRY = false;
+constexpr bool CARRY = true;
+
+struct Bit
 {
-	int num = b1.num + b2.num;
+	int num_{0};
+	bool carry_{false};	
+
+	Bit( int n = 0, bool c = false ): num_( n ), carry_( c ){ }
+	Bit & operator+=( int n )
+	{
+		num_ += n;
+		if (num_<10)
+		{
+			carry_ = false;
+		}
+		else
+		{
+			num_ = num_%10;
+			carry_ = true;
+		}
+		
+		return *this;
+	}
+	Bit & operator+=( Bit && rb )
+	{
+		num_ += rb.num_;
+		carry_ = rb.carry_;
+		return *this;
+	}
+};
+
+ostream& operator<<(ostream &os,const Bit &bit)
+{
+	os << bit.num_ << endl;
+	return os;
+}
+
+Bit operator+( const Bit & b1, const Bit & b2 )
+{
+	int num = b1.num_ + b2.num_;
 	if ( num < 10)
 	{
-		return BitNum( num, false );
+		return Bit( num, false );
 	} 
 	else
 	{
 		num = num % 10;
-		return BitNum( num, true );
+		return Bit( num, true );
 	}
 }
 
-BigNum operator+( const BigNum & b1, const BigNum & b2 )
+class BigNum
 {
-	if ( b1.IsNegative() ^ b2.IsNegative() )	//Ò»ÕıÒ»¸ºÔò×ö¼õ·¨
+	friend BigNum operator+( const BigNum & num1, const BigNum & num2 );
+private:	
+	bool negative_{false}; 
+	list<Bit> bit_num_;
+public:
+	BigNum( ): bit_num_( list<Bit>( ) ), negative_( false ){ }
+	BigNum( size_t n,  Bit bn ): bit_num_( n, bn ),negative_( false ){ }
+	BigNum( const string & str_num )
 	{
-		return operator-( b1, b2 );
+		//è¿™é‡Œå°±æ‡’å¾—å¤„ç†éæ³•è¾“å…¥çš„å¼‚å¸¸äº†
+		//ä»é«˜ä½åˆ°ä½ä½è¾“å…¥
+		string::const_iterator it = str_num.begin();
+		if ( '-' == *it )//æœ€é«˜ä½ä¸º-åˆ™ä¸ºè´Ÿæ•°
+		{
+			negative_ = true;
+			++it;
+		}
+		for ( ; it != str_num.end(); it++ )
+		{
+			int n = (*it) - '0';
+			bit_num_.emplace_back(n,false);
+		}
+	}
+	bool IsNegative( ) const { return negative_; }
+	size_t Len( ) const { return bit_num_.size( ); }
+	void Display() const 
+	{ 
+		cout << boolalpha << negative_ << ":" << endl;
+		print_container(bit_num_.begin(),bit_num_.end(),"");
+	}
+};
+
+//ä¸ºBitNumå®ç°+è¿ç®—ç¬¦ï¼ŒåŠ çš„ç»“æœåˆ¤æ–­æ˜¯å¦å¤§äºç­‰äº10ï¼Œè‹¥æ˜¯åˆ™è®¾ç½®carryä¸ºtrueè¡¨ç¤ºå¸¦äº†ä¸€ä½åˆ°é“¾è¡¨çš„ä¸‹ä¸€ä¸ªèŠ‚ç‚¹ï¼ŒæŠŠè¯¥ç»“æœæ¨¡10æ±‚ä½™æ•°å­˜åˆ°é“¾è¡¨çš„èŠ‚ç‚¹é‡Œ
+BigNum operator+( const BigNum & num1, const BigNum & num2 )
+{
+	if ( num1.IsNegative() ^ num2.IsNegative() )	
+	{
+		//return operator-( b1, b2 );//å‡æ³•æ‡’å¾—å†™äº†
 	} 
 	else
 	{
-		//¿¼ÂÇ2¸öÊıµÄÎ»Êı¿ÉÄÜ»á²»Ò»Ñù£¬ÏÈ´Ó¼òµ¥µÄÇé¿ö¿ªÊ¼ÊÔÒ»ÏÂ£¬Èç46295+36
-		size_t len_max = __max( b1.Len( ), b2.Len( ) );
-		size_t len_min = __min( b1.Len( ), b2.Len( ) );
-		//ÒÔÎ»Êı½Ï¶àµÄ¹¹Ôìresult£¬½á¹û·Åµ½resultÀï
-		BigNum result = BigNum( len_max, BitNum( 0, false ) );
-		list<BitNum>::iterator it_res = result.list_bn.begin();
-		advance( it_res, len_max - 1 );	//Ö¸Ïò×îºóÒ»¸ö½Úµã£¬Ò²¾ÍÊÇ¸öÎ»Êı
-		list<BitNum>::const_iterator it1 = b1.list_bn.begin();
-		advance( it1, b1.Len( )-1 );		//Ö¸Ïò×îºóÒ»¸ö½Úµã£¬Ò²¾ÍÊÇ¸öÎ»Êı
-		list<BitNum>::const_iterator it2 = b2.list_bn.begin();
-		advance( it2, b2.Len( )-1 );	//Ö¸Ïò×îºóÒ»¸ö½Úµã£¬Ò²¾ÍÊÇ¸öÎ»Êı
+		//è€ƒè™‘2ä¸ªæ•°çš„ä½æ•°å¯èƒ½ä¼šä¸ä¸€æ ·ï¼Œå…ˆä»ç®€å•çš„æƒ…å†µå¼€å§‹è¯•ä¸€ä¸‹ï¼Œå¦‚46295+36
+		size_t len_max = __max( num1.Len( ), num2.Len( ) );
+		size_t len_min = __min( num1.Len( ), num2.Len( ) );
+		//ä»¥ä½æ•°è¾ƒå¤šçš„æ„é€ resultï¼Œç»“æœæ”¾åˆ°resulté‡Œ
+		BigNum result = BigNum( len_max+1, Bit( 0, NO_CARRY ) );
+		list<Bit>::iterator bit_res = result.bit_num_.begin();
+		advance( bit_res, len_max );	//æŒ‡å‘æœ€åä¸€ä¸ªèŠ‚ç‚¹ï¼Œä¹Ÿå°±æ˜¯ä¸ªä½æ•°
+		list<Bit>::const_iterator it1 = num1.bit_num_.begin();
+		advance( it1, num1.Len( )-1 );		
+		list<Bit>::const_iterator it2 = num2.bit_num_.begin();
+		advance( it2, num2.Len( )-1 );	
 		
-		//ÏÈËã95+36
-		//´ÓµÍÎ»µ½¸ßÎ»×ö¼Ó·¨
+		auto pre = bit_res;
+		//å…ˆç®—95+36
+		//ä»ä½ä½åˆ°é«˜ä½åšåŠ æ³•
 		for( size_t i = 0; i < len_min; i++ )
 		{
-			//ÒòÎªit_resµÄËùÓĞÎ»Ö»¿ÉÄÜÊÇ0£¬Îª1ÔòÒâÎ¶×ÅÊÇµÍÎ»½øÉÏÀ´µÄ
-			if ( it_res->num == 1 )
+			if (true==pre->carry_)
 			{
-				*it_res = *it1 + *it2;
-				*it_res += 1;
-			} 
-			else
-			{
-				*it_res = *it1 + *it2;
+				*bit_res += 1;
 			}
-			
-			if ( it1 != b1.list_bn.begin() )
-			{
-				it1--;
-			}
-			if ( it2 != b2.list_bn.begin() )
-			{
-				it2--;
-			}
-			//Èç¹û¸ÃÎ»²úÉúÁË½øÎ»
-			if ( it_res->carry )
-			{
-				it_res--;
-				//ÔòËüµÄ¸ü¸ßÒ»Î»¼Ó1
-				*it_res += 1;
-			}
-			else
-				it_res--;
+			*bit_res += (*it1-- + *it2--);
+			pre = bit_res--;	
 		}
-		//ÕâÊ±ºòit1Óëit2ÖĞµÄÆäÖĞÒ»¸ö¿Ï¶¨µ½´ïbeginÁË
-		list<BitNum>::const_iterator it_tmp;
-		if ( it1 == b1.list_bn.begin() )
+		if (true==pre->carry_)
+		{
+			*bit_res += 1;
+		}
+
+		//è¿™æ—¶å€™it1ä¸it2ä¸­çš„å…¶ä¸­ä¸€ä¸ªè‚¯å®šåˆ°è¾¾beginäº†
+		list<Bit>::const_iterator it_tmp;
+		if ( it1 == num1.bit_num_.begin() )
 		{
 			it_tmp = it2;
 		} 
@@ -144,21 +152,21 @@ BigNum operator+( const BigNum & b1, const BigNum & b2 )
 		{
 			it_tmp = it1;
 		}
-		//ÔÙËã462+Ê£ÓàµÄ0
+		//å†ç®—462+å‰©ä½™çš„0
 		for ( size_t j = len_min + 1; j <= len_max; j++ )
 		{
-			*it_res = *it_res + *it_tmp;
-			if ( it_res != result.list_bn.begin() )
+			*bit_res = *bit_res + *it_tmp;
+			if ( bit_res != result.bit_num_.begin() )
 			{
 				it_tmp--;
-				it_res--;
+				bit_res--;
 			}
 		}
-		//×î¸ßÎ»ÓĞ¿ÉÄÜ»á²úÉú½øÎ»
-		if ( it_res->carry )
+		//æœ€é«˜ä½æœ‰å¯èƒ½ä¼šäº§ç”Ÿè¿›ä½
+		if ( bit_res->carry_ )
 		{
-			result.list_bn.push_back( BitNum( 1, false ) );
-		} 
+			result.bit_num_.emplace_back( 1, false );
+		}
 		return result;
 	}
 }
@@ -172,11 +180,7 @@ int main( )
 	BigNum b2( str2 );
 	BigNum res = b1 + b2;
 
-	for ( list<BitNum>::iterator it = res.list_bn.begin(); it != res.list_bn.end(); ++it )
-	{
-		cout << it->num;
-	}
-	cout << endl;
+	res.Display();
 
 	return 0;
 }

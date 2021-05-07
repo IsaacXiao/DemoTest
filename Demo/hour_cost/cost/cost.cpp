@@ -11,7 +11,7 @@ void SlowFunc();
 #define COST_FUNC __declspec(dllexport)
 #endif // WIN32
 
-//题目设置这个函数参数对求时间开销没意义啊
+
 extern "C" COST_FUNC void GetCost(const char* date)
 {
 	auto begin = std::chrono::high_resolution_clock::now();

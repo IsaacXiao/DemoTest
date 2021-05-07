@@ -22,7 +22,13 @@ void Thread_Fun1(std::promise<FncT> &p)
 	std::cout << "传入函数Test_Fun" << std::endl;
  
 	//传入函数Test_Fun
-	p.set_value(std::bind(&Test_Fun, std::placeholders::_1));
+	//p.set_value(std::bind(&Test_Fun, std::placeholders::_1));
+	p.set_value([](int iVal) ->int
+		{
+			std::cout << "Value is:" << iVal << std::endl;
+			return iVal + 999;			
+		}
+	);
 }
  
 void Thread_Fun2(std::future<FncT> &f)

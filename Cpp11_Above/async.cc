@@ -10,6 +10,7 @@ std::string fetchDataFromDB(std::string recvData)
 {
 	std::cout << "fetchDataFromDB start" << std::this_thread::get_id() << std::endl;
 	std::this_thread::sleep_for(seconds(5));
+	std::cout << "std::launch::async" << std::endl;
 	return "DB_" + recvData;
 }
  
@@ -17,6 +18,7 @@ std::string fetchDataFromFile(std::string recvData) {
  
 	std::cout << "fetchDataFromFile start" << std::this_thread::get_id() << std::endl;
 	std::this_thread::sleep_for(seconds(3));
+	std::cout << "std::launch::async" << std::endl;
 	return "File_" + recvData;
 }
  
@@ -32,7 +34,7 @@ int main()
 	//从文件获取数据
 	std::future<std::string> fileData = std::async(std::launch::deferred, fetchDataFromFile, "Data");
  
-	//知道调用get函数fetchDataFromFile才开始执行
+	//直到调用get函数fetchDataFromFile才开始执行
 	std::string FileData = fileData.get();
 	//如果fetchDataFromDB()执行没有完成，get会一直阻塞当前线程
 	std::string dbData = resultFromDB.get();
